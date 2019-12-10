@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>浏览器解码顺序 - p0laris_北极星</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="北极星,"> 
+    <meta name="description" content="0x00 个人理解；不觉得很对；看看就好；自己思考；0x01 试验一个正常的HTML页面解码的顺序是URL-&amp;gt;HTML-&amp;gt;CSS-&amp;gt;JS；正常的意思就是一个get请求一个界面；
+使,"> 
+    <meta name="author" content="p0laris"> 
+    <link rel="alternative" href="atom.xml" title="p0laris_北极星" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">p0laris_北极星</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;" data-url="http://yoursite.com"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">浏览器解码顺序</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">浏览器解码顺序</h1>
+        <div class="stuff">
+            <span>十二月 10, 2019</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E9%BB%98%E8%AE%A4%E6%A0%87%E7%AD%BE/" rel="tag">默认标签</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="0x00-个人理解；不觉得很对；看看就好；自己思考；"><a href="#0x00-个人理解；不觉得很对；看看就好；自己思考；" class="headerlink" title="0x00 个人理解；不觉得很对；看看就好；自己思考；"></a>0x00 个人理解；不觉得很对；看看就好；自己思考；</h2><h2 id="0x01-试验"><a href="#0x01-试验" class="headerlink" title="0x01 试验"></a>0x01 试验</h2><p>一个正常的HTML页面解码的顺序是URL-&gt;HTML-&gt;CSS-&gt;JS；正常的意思就是一个get请求一个界面；</p>
+<p>使用下面的例子来说明各种解码；</p>
+<p>为了方便贴上a字符的各种编码；</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th align="center">ASCII八进制</th>
+<th align="center">ASCII十进制</th>
+<th align="center">ASCII十六进制</th>
+<th align="center">Base64</th>
+<th align="center">URL编码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>a</td>
+<td align="center">141</td>
+<td align="center">97</td>
+<td align="center">61</td>
+<td align="center">YQ==</td>
+<td align="center">%61</td>
+</tr>
+<tr>
+<td>JSUnicode</td>
+<td align="center">JS八进制</td>
+<td align="center">JS十六进制</td>
+<td align="center">HTML字符实体</td>
+<td align="center">HTML十进制实体</td>
+<td align="center">HTML十六进制实体</td>
+</tr>
+<tr>
+<td>\u0061</td>
+<td align="center">\141</td>
+<td align="center">\x61</td>
+<td align="center">null</td>
+<td align="center">&amp;#97;</td>
+<td align="center">&amp;#x61;</td>
+</tr>
+</tbody></table>
+<p>eg：<code>&lt;a href=javascript:alert(&#39;a&#39;)&gt;code&lt;/a&gt;</code></p>
+<p>进行如下变形：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"Content-Type"</span> <span class="attr">content</span>=<span class="string">"text/html; charset=utf-8"</span> /&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">HTML十六进制实体编码1：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">j&amp;#x61;vascript:&amp;#x61;lert(</span>'&amp;#<span class="attr">x61</span>;')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">URL编码2：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">j%61vascript:alert(</span>'%<span class="attr">61</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">URL编码3：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:%61lert(</span>'%<span class="attr">61</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">JS十六进制编码4：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:alert(</span>'\<span class="attr">x61</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">JS十六进制编码5：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:&amp;\x61lert(</span>'\<span class="attr">x61</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">先URL后JS十六进制6：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:alert(</span>'\<span class="attr">x25</span>\<span class="attr">x06</span>\<span class="attr">x01</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">先JS十六进制后URL7：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:alert(</span>'%<span class="attr">5c</span>%<span class="attr">78</span>%<span class="attr">36</span>%<span class="attr">31</span>')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">双重HTML8：<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">javascript:alert(</span>'&amp;#<span class="attr">x26</span>;&amp;#<span class="attr">x23</span>;&amp;#<span class="attr">x78</span>;&amp;#<span class="attr">x36</span>;&amp;#<span class="attr">x31</span>;&amp;#<span class="attr">x3b</span>;')&gt;</span>code<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">br</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<p>经过浏览器一次渲染后的结果：<br><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160317812-114559696.jpg" alt=""></p>
+<p>如表：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">1</th>
+<th align="center">2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">源代码</td>
+<td align="center"><code>&lt;a href=j&amp;#x61;vascript:&amp;#x61;lert(&#39;&amp;#x61;&#39;)&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=j%61vascript:alert(&#39;%61&#39;)&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">一次渲染</td>
+<td align="center"><code>&lt;a href=&quot;javascript:alert(&#39;a&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=&quot;j%61vascript:alert(&#39;%61&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">二次点击</td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160404650-1951316217.jpg" alt=""></td>
+<td align="center">无法访问403</td>
+</tr>
+<tr>
+<td align="center">解释</td>
+<td align="center">一次渲染解码HTML；点击执行JS弹框</td>
+<td align="center">一次渲染没有进行URL解码；超链接伪协议不完整，不会触发js弹窗；直接403；</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">3</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center">源代码</td>
+<td align="center"><code>&lt;a href=javascript:%61lert(&#39;%61&#39;)&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=javascript:alert(&#39;\x61&#39;)&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">一次渲染</td>
+<td align="center"><code>&lt;a href=&quot;javascript:%61lert(&#39;%61&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=&quot;javascript:alert(&#39;\x61&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">点击</td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160412164-623861694.jpg" alt=""></td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160449574-308361989.jpg" alt=""></td>
+</tr>
+<tr>
+<td align="center">解释</td>
+<td align="center">一次渲染没有解码；点击弹窗说明执行了URL解码，对比2，伪协议完整，本身没有编码，对后面进行URL解码；</td>
+<td align="center">一次渲染无解码；点击执行URL和JS解码；</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">5</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center">源代码</td>
+<td align="center"><code>&lt;a href=javascript:&amp;\x61lert(&#39;\x61&#39;)&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=javascript:alert(&#39;\x25\x06\x01&#39;)&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">一次渲染</td>
+<td align="center"><code>&lt;a href=&quot;javascript:&amp;\x61lert(&#39;\x61&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=&quot;javascript:alert(&#39;\x25\x06\x01&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">点击</td>
+<td align="center">点击无响应，页面无变化</td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160523224-1001941081.jpg" alt=""></td>
+</tr>
+<tr>
+<td align="center">解释</td>
+<td align="center">一次无解码；二次点击页面无变化没有403，对比2，说明这里伪协议是正常的；只是无法执行js</td>
+<td align="center">对比7</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">7</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">源代码</td>
+<td align="center"><code>&lt;a href=javascript:alert(&#39;%5c%78%36%31&#39;)&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=javascript:alert(&#39;&amp;#x26;&amp;#x23;&amp;#x78;&amp;#x36;&amp;#x31;&amp;#x3b;&#39;)&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">一次渲染</td>
+<td align="center"><code>&lt;a href=&quot;javascript:alert(&#39;%5c%78%36%31&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+<td align="center"><code>&lt;a href=&quot;javascript:alert(&#39;&amp;#x61;&#39;)&quot;&gt;code&lt;/a&gt;</code></td>
+</tr>
+<tr>
+<td align="center">点击</td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160531707-573909841.jpg" alt=""></td>
+<td align="center"><img src="https://img2018.cnblogs.com/blog/1861424/201911/1861424-20191120160537665-1074775195.jpg" alt=""></td>
+</tr>
+<tr>
+<td align="center">解释</td>
+<td align="center">渲染无解码；对比6，说明一次渲染只执行了HTML解码，点击做了URL和JS的解码，并且解码顺序为先URL后JS</td>
+<td align="center">二次点击没有执行HTMl解码</td>
+</tr>
+</tbody></table>
+<h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><p>解析编码的时候是先构建DOM树，我的理解就是在自己环境中是不能编码自己的，编码其他类似不影响解析HTMLDOM树的元素，就可以进行解码，而且需要完整的环境执行起来才可以进行解析；</p>
+<p>HTMl实体字符是为了在HTML文档中能够显示一些预定义的字符；其他的一些编码，为了转义显示或者是传输方便，可以类比HTML实体编码套用，就是不能编码’自己’的或者自己的’爸爸’；</p>
+<p>JSUnicode编码，需要\u开头，四位，不足位补0；表中的a的JSUnicode编码；</p>
+<p>所以：要正常解析HTML的DOM节点的话，就不能对构成DOM的元素进行HTML编码；其他编码类似；</p>
+<p>当执行到什么环境的时候，组成这个环境的元素还在编码的状态就会出现错误，环境不完整，造成无法解析；普通的值一般都是可以编码的；</p>
+<p>符号什么的还没有试验；</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_3971123&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_138243&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                        
+                            <li title='2' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_7149583&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
