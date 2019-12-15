@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Web渗透思路-更新 - p0laris_北极星</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="北极星,"> 
+    <meta name="description" content="总体思路​    “所有存在参数的地方都需要测试”，“脚本是入侵的前提”​    忘记了在哪里看到的这句话，觉得很有道理；后来我考虑了一下这句话的意思，存在参数的话那是不是就是说纯静态的网站就是安全,"> 
+    <meta name="author" content="p0laris"> 
+    <link rel="alternative" href="atom.xml" title="p0laris_北极星" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">p0laris_北极星</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;" data-url="http://yoursite.com"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">Web渗透思路-更新</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">Web渗透思路-更新</h1>
+        <div class="stuff">
+            <span>十二月 15, 2019</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E9%BB%98%E8%AE%A4%E6%A0%87%E7%AD%BE/" rel="tag">默认标签</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="总体思路"><a href="#总体思路" class="headerlink" title="总体思路"></a>总体思路</h2><p>​    <strong>“所有存在参数的地方都需要测试”，“脚本是入侵的前提”</strong><br>​    忘记了在哪里看到的这句话，觉得很有道理；后来我考虑了一下这句话的意思，存在参数的话那是不是就是说纯静态的网站就是安全的了；基本上是对的；<br>​    首先，纯静态的站点一般是没有后台的，可以说后台就是网站的根目录，写好网站直接丢进去就OK了，没有数据库没有后台登录，也可使用一些静态站点生成的辅助类程序来生成；找到一段话：<br>“纯静态为啥还有后台登录这种东西？<br>不考虑服务器本身漏洞以及旁注渗透C段等一系列乱七八糟的问题，<br>纯静态可以认为是安全的，<br>没有动态脚本、不与数据库交互，<br>神马注入、上传、抓包改包、xss都死一边去。<br>说白了我服务器本身都不支持写入和执行脚本，<br>你还想入侵，折腾啥玩意？”</p>
+<p>​    <strong>不考虑主机侧的漏洞，只说Web侧</strong><br>​    动态的站点和静态的站点中的差别主要就是和用户的交互；那我们可不可以认为只要有交互的地方，有参数的地方就有可能存在漏洞呢？</p>
+<h2 id="wEb的具体思路"><a href="#wEb的具体思路" class="headerlink" title="wEb的具体思路"></a>wEb的具体思路</h2><p><strong>可能刚开始挖到的都是一些信息泄露（反正我是这样的，虽然有一些很严重的信息泄露，但终究还是信息泄露，fuck不到控制权）不要灰心；</strong></p>
+<p><strong>真正的在做的时候，我们可能不会按照特别完整的渗透流程对一个站点从头到尾的来一遍，所以哪些应该是我们必须需要做的，或者说简化一下流程？</strong></p>
+<h3 id="永远的信息收集-其实也就是信息泄露的挖掘过程"><a href="#永远的信息收集-其实也就是信息泄露的挖掘过程" class="headerlink" title="永远的信息收集_其实也就是信息泄露的挖掘过程"></a>永远的信息收集_其实也就是信息泄露的挖掘过程</h3><h4 id="拿到一个站点的首页：我们的步骤"><a href="#拿到一个站点的首页：我们的步骤" class="headerlink" title="拿到一个站点的首页：我们的步骤"></a>拿到一个站点的首页：我们的步骤</h4><ol>
+<li>先扔到云悉上碰下运气：<a href="http://www.yunsee.cn/" target="_blank" rel="noopener">http://www.yunsee.cn/</a></li>
+<li>判断出容器，系统，cms，语言，框架，数据库等等；</li>
+<li>url向前，挖子域名（域传送漏洞）：Layer<strong>我列出的工具基本都是win下的工具，整理好后会放一个工具包上来；kali用的还是有点少的；</strong>子域名一般是对应C段的ip或者子目录或其他ip；</li>
+<li>url向后，子目录，所有显式链接：御剑，wwwscan，各综合型漏扫的爬虫功能还是比较好用的；推荐awvs的爬虫；</li>
+<li>whois，google搜索相关信息；</li>
+<li>以上做完通常可以找到一些备份文件，功能点，敏感人员信息的泄露，点开你找到的每一个信息，仔细看，用好关键字Ctrl+F搜索；</li>
+</ol>
+<h3 id="漏洞挖掘阶段"><a href="#漏洞挖掘阶段" class="headerlink" title="漏洞挖掘阶段"></a>漏洞挖掘阶段</h3><ol>
+<li>通过你判断出的<strong>容器版本，语言框架版本，数据库信息，cms类型</strong>查找相关的已知漏洞；<ul>
+<li>这里你需要掌握大量的渗透脚本，已知漏洞；</li>
+</ul>
+</li>
+<li>首先通过以上步骤99%的情况下你会找到后台或者是一些管理的界面<ul>
+<li>尝试万能密码，弱口令，爆破，未授权访问；</li>
+</ul>
+</li>
+<li>上传点，可以直接getshell<ul>
+<li>最好的情况是漏扫直接扫出来一个上传点</li>
+<li>手动找，google找，编辑器</li>
+</ul>
+</li>
+<li>文件包含和目录遍历<ul>
+<li>目录遍历我认为就是文件包含的一种子集；找各种可能存在文件包含的参数</li>
+</ul>
+</li>
+<li>文件下载<ul>
+<li>一般的网站都会有一些文件可以下载，尝试任意文件下载</li>
+</ul>
+</li>
+<li>Sql注入<ul>
+<li>挨个尝试参数</li>
+</ul>
+</li>
+<li>命令执行&amp;代码执行</li>
+<li>xss，csrf，ssrf，xxe不容易直接获取shell的方式</li>
+<li>代码审计，通过各种途径搞到源代码</li>
+<li>通过主机侧进行渗透<ul>
+<li>系统exp</li>
+<li>端口服务渗透</li>
+<li>旁站来一遍</li>
+</ul>
+</li>
+<li>社工</li>
+</ol>
+<p>暂时这么多；</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_3971123&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_138243&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                        
+                            <li title='2' data-url='http://www.170mv.com/kw/antiserver.kuwo.cn/anti.s?rid=MUSIC_7149583&response=res&format=mp3|aac&type=convert_url&br=128kmp3&agent=iPhone&callback=getlink&jpcallback=getlink.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
